@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Precificação - Prestador de Serviços</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .section-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+        .section-card:hover {
+            transform: translateY(-2px);
+        }
+        .result-cell {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+        }
+        .input-cell {
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            transition: border-color 0.2s ease;
+            background: white;
+        }
+        .input-cell:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+        .header-cell {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            font-weight: bold;
+        }
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        td, th {
+            border: 1px solid #e2e8f0;
+            padding: 8px 12px;
+        }
+        th:first-child {
+            border-top-left-radius: 12px;
+        }
+        th:last-child {
+            border-top-right-radius: 12px;
+        }
+        tr:last-child td:first-child {
+            border-bottom-left-radius: 12px;
+        }
+        tr:last-child td:last-child {
+            border-bottom-right-radius: 12px;
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="mb-4">
+                <h2 class="text-3xl font-bold text-purple-700 mb-2">AKSSA CONSULTORIA</h2>
+            </div>
+            
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">💼 Calculadora de Precificação</h1>
+            <p class="text-gray-600 mb-4">Para Prestadores de Serviços Profissionais</p>
+            
+            <!-- Template Notice -->
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 max-w-4xl mx-auto">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl">📋</span>
+                    </div>
+                    <div class="ml-3 text-left">
+                        <h3 class="text-lg font-semibold text-blue-800 mb-2">Modelo Pré-Preenchido</h3>
+                        <p class="text-blue-700 mb-2">
+                            Esta calculadora já vem com valores de exemplo para facilitar seu uso. 
+                            <strong>Substitua todos os valores pelos seus dados reais</strong> para obter uma precificação precisa.
+                        </p>
+                        <div class="text-sm text-blue-600">
+                            <p><strong>📝 Como usar:</strong></p>
+                            <ul class="list-disc list-inside mt-1 space-y-1">
+                                <li>Substitua os valores de exemplo pelos seus custos reais</li>
+                                <li>Adicione novos custos usando os botões "+" quando necessário</li>
+                                <li>Ajuste as configurações de horas e margem conforme sua realidade</li>
+                                <li>Os preços são calculados automaticamente conforme você digita</li>
+                                <li>Use o botão "Exportar PDF" para salvar o relatório final</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: Custos e Configuração -->
+        <div class="section-card p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm mr-3">1</span>
+                Custos e Configuração
+            </h2>
+            
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Custos Fixos -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 text-blue-700">Custos Fixos Mensais</h3>
+                    <div class="table-container">
+                        <table class="w-full">
+                            <thead>
+                                <tr>
+                                    <th class="header-cell text-left">Item</th>
+                                    <th class="header-cell text-center">Valor (R$)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-semibold">Aluguel/Escritório</td>
+                                    <td class="text-center">
+                                        <input type="number" id="aluguel" class="input-cell w-24 p-2 text-center" value="800" oninput="calculateAll()">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Internet/Telefone</td>
+                                    <td class="text-center">
+                                        <input type="number" id="internet" class="input-cell w-24 p-2 text-center" value="150" oninput="calculateAll()">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Software/Licenças</td>
+                                    <td class="text-center">
+                                        <input type="number" id="software" class="input-cell w-24 p-2 text-center" value="300" oninput="calculateAll()">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Energia Elétrica</td>
+                                    <td class="text-center">
+                                        <input type="number" id="energia" class="input-cell w-24 p-2 text-center" value="200" oninput="calculateAll()">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Contador/Contabilidade</td>
+                                    <td class="text-center">
+                                        <input type="number" id="contador" class="input-cell w-24 p-2 text-center" value="150" oninput="calculateAll()">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Marketing</td>
+                                    <td class="text-center">
+                                        <input type="number" id="marketing" class="input-cell w-24 p-2 text-center" value="400" oninput="calculateAll()">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Outros Fixos</td>
+                                    <td class="text-center">
+                                        <input type="number" id="outros-fixos" class="input-cell w-24 p-2 text-center" value="300" oninput="calculateAll()">
+                                    </td>
+                                </tr>
+                                <tbody id="custos-fixos-extras"></tbody>
+                                <tr>
+                                    <td colspan="2" class="text-center py-2">
+                                        <button onclick="addCustoFixo()" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                                            + Adicionar Custo Fixo
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="bg-blue-50">
+                                    <td class="font-bold">Total Custos Fixos</td>
+                                    <td class="result-cell text-center font-bold">R$ <span id="total-fixos">2.300,00</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Custos Variáveis e Configuração -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 text-green-700">Custos Variáveis e Configuração</h3>
+                    <div class="table-container">
+                        <table class="w-full">
+                            <thead>
+                                <tr>
+                                    <th class="header-cell text-left">Item</th>
+                                    <th class="header-cell text-center">Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-semibold">Transporte/Combustível</td>
+                                    <td class="text-center">
+                                        <input type="number" id="transporte" class="input-cell w-24 p-2 text-center" value="300" oninput="calculateAll()">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Material/Suprimentos</td>
+                                    <td class="text-center">
+                                        <input type="number" id="material" class="input-cell w-24 p-2 text-center" value="200" oninput="calculateAll()">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Capacitação/Cursos</td>
+                                    <td class="text-center">
+                                        <input type="number" id="cursos" class="input-cell w-24 p-2 text-center" value="150" oninput="calculateAll()">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Outros Variáveis</td>
+                                    <td class="text-center">
+                                        <input type="number" id="outros-variaveis" class="input-cell w-24 p-2 text-center" value="100" oninput="calculateAll()">
+                                    </td>
+                                </tr>
+                                <tbody id="custos-variaveis-extras"></tbody>
+                                <tr>
+                                    <td colspan="2" class="text-center py-2">
+                                        <button onclick="addCustoVariavel()" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">
+                                            + Adicionar Custo Variável
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="bg-green-50">
+                                    <td class="font-bold">Total Custos Variáveis</td>
+                                    <td class="result-cell text-center font-bold">R$ <span id="total-variaveis">750,00</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Pró-labore Desejado</td>
+                                    <td class="text-center">
+                                        <input type="number" id="pro-labore" class="input-cell w-24 p-2 text-center" value="3000" oninput="calculateAll()">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Impostos/Tributos</td>
+                                    <td class="text-center">
+                                        <input type="number" id="impostos" class="input-cell w-24 p-2 text-center" value="200" oninput="calculateAll()">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Margem de Segurança (%)</td>
+                                    <td class="text-center">
+                                        <input type="number" id="margem" class="input-cell w-24 p-2 text-center" value="20" step="0.1" oninput="calculateAll()">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Horas Semanais</td>
+                                    <td class="text-center">
+                                        <input type="number" id="horas-semanais" class="input-cell w-24 p-2 text-center" value="40" oninput="calculateAll()">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Horas Não Produtivas</td>
+                                    <td class="text-center">
+                                        <input type="number" id="horas-nao-produtivas" class="input-cell w-24 p-2 text-center" value="8" oninput="calculateAll()">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Equipamentos -->
+        <div class="section-card p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <span class="bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm mr-3">2</span>
+                Equipamentos e Depreciação
+            </h2>
+            
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Equipamentos Quitados -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-green-700">Equipamentos Quitados</h3>
+                        <button onclick="addEquipamento('quitado')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">
+                            + Adicionar
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="w-full">
+                            <thead>
+                                <tr>
+                                    <th class="header-cell text-left">Equipamento</th>
+                                    <th class="header-cell text-center">Valor (R$)</th>
+                                    <th class="header-cell text-center">Vida Útil (anos)</th>
+                                    <th class="header-cell text-center">Depreciação/Mês</th>
+                                </tr>
+                            </thead>
+                            <tbody id="equipamentos-quitados">
+                                <tr>
+                                    <td><input type="text" class="input-cell w-full p-2" value="Notebook" oninput="calculateAll()"></td>
+                                    <td class="text-center"><input type="number" class="input-cell w-20 p-2 text-center" value="3000" oninput="calculateAll()"></td>
+                                    <td class="text-center"><input type="number" class="input-cell w-16 p-2 text-center" value="3" oninput="calculateAll()"></td>
+                                    <td class="text-center font-mono text-sm" id="dep-quitado-0">R$ 83,33</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="text" class="input-cell w-full p-2" value="Câmera" oninput="calculateAll()"></td>
+                                    <td class="text-center"><input type="number" class="input-cell w-20 p-2 text-center" value="2500" oninput="calculateAll()"></td>
+                                    <td class="text-center"><input type="number" class="input-cell w-16 p-2 text-center" value="5" oninput="calculateAll()"></td>
+                                    <td class="text-center font-mono text-sm" id="dep-quitado-1">R$ 41,67</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Equipamentos Financiados -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-blue-700">Equipamentos Financiados</h3>
+                        <button onclick="addEquipamento('financiado')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                            + Adicionar
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="w-full">
+                            <thead>
+                                <tr>
+                                    <th class="header-cell text-left">Equipamento</th>
+                                    <th class="header-cell text-center">Parcela/Mês (R$)</th>
+                                    <th class="header-cell text-center">Parcelas Restantes</th>
+                                    <th class="header-cell text-center">Custo/Mês</th>
+                                </tr>
+                            </thead>
+                            <tbody id="equipamentos-financiados">
+                                <tr>
+                                    <td><input type="text" class="input-cell w-full p-2" value="Impressora" oninput="calculateAll()"></td>
+                                    <td class="text-center"><input type="number" class="input-cell w-20 p-2 text-center" value="150" oninput="calculateAll()"></td>
+                                    <td class="text-center"><input type="number" class="input-cell w-16 p-2 text-center" value="12" oninput="calculateAll()"></td>
+                                    <td class="text-center font-mono text-sm" id="custo-financiado-0">R$ 150,00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumo Equipamentos -->
+            <div class="mt-6 grid md:grid-cols-2 gap-4">
+                <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+                    <div class="font-semibold text-green-800">Depreciação Mensal</div>
+                    <div class="text-2xl font-bold text-green-600">R$ <span id="total-depreciacao">125,00</span></div>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                    <div class="font-semibold text-blue-800">Financiamentos Mensais</div>
+                    <div class="text-2xl font-bold text-blue-600">R$ <span id="total-financiamentos">150,00</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Resultados -->
+        <div class="section-card p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <span class="bg-purple-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm mr-3">3</span>
+                Cálculo de Preços
+            </h2>
+            
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Cálculos Base -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 text-purple-700">Cálculos Base</h3>
+                    <div class="table-container">
+                        <table class="w-full">
+                            <thead>
+                                <tr>
+                                    <th class="header-cell text-left">Item</th>
+                                    <th class="header-cell text-center">Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-semibold">Custo Total Mensal</td>
+                                    <td class="text-center font-mono">R$ <span id="custo-total-mensal">6.425,00</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Horas Produtivas/Mês</td>
+                                    <td class="text-center font-mono"><span id="horas-produtivas">138,6</span>h</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Custo por Hora Base</td>
+                                    <td class="text-center font-mono">R$ <span id="custo-hora-base">46,36</span></td>
+                                </tr>
+                                <tr class="bg-purple-50">
+                                    <td class="font-bold">Valor Hora com Margem</td>
+                                    <td class="result-cell text-center font-bold text-lg">R$ <span id="valor-hora-final">55,63</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Preços de Serviços -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 text-purple-700">Preços de Serviços</h3>
+                    <div class="space-y-4">
+                        <!-- Valor Hora -->
+                        <div class="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
+                            <div class="font-semibold text-purple-800">Valor por Hora</div>
+                            <div class="text-3xl font-bold text-purple-600">R$ <span id="preco-hora">55,63</span></div>
+                        </div>
+
+                        <!-- Meio Período -->
+                        <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                            <div class="font-semibold text-blue-800">Meio Período (4 horas)</div>
+                            <div class="text-3xl font-bold text-blue-600">R$ <span id="preco-meio-periodo">222,52</span></div>
+                            <div class="text-sm text-blue-600 mt-1">Inclui desconto de 10%</div>
+                        </div>
+
+                        <!-- Diária -->
+                        <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+                            <div class="font-semibold text-green-800">Diária (8 horas)</div>
+                            <div class="text-3xl font-bold text-green-600">R$ <span id="preco-diaria">400,54</span></div>
+                            <div class="text-sm text-green-600 mt-1">Inclui desconto de 10%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuração de Descontos -->
+            <div class="mt-8">
+                <h3 class="text-lg font-semibold mb-4">Configuração de Descontos</h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Desconto Meio Período (%):</label>
+                        <input type="number" id="desconto-meio" class="input-cell w-full p-2" value="10" step="0.1" oninput="calculateAll()">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Desconto Diária (%):</label>
+                        <input type="number" id="desconto-diaria" class="input-cell w-full p-2" value="10" step="0.1" oninput="calculateAll()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Faixas de Preço -->
+            <div class="mt-8">
+                <h3 class="text-lg font-semibold mb-4">Faixas de Preço por Hora</h3>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500">
+                        <div class="font-semibold text-yellow-800">Mínimo (Custo)</div>
+                        <div class="text-2xl font-bold text-yellow-600">R$ <span id="faixa-minimo">55,63</span></div>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                        <div class="font-semibold text-blue-800">Padrão (+30%)</div>
+                        <div class="text-2xl font-bold text-blue-600">R$ <span id="faixa-padrao">72,32</span></div>
+                    </div>
+                    <div class="bg-purple-50 p-4 p-4 rounded-lg border-l-4 border-purple-500">
+                        <div class="font-semibold text-purple-800">Premium (+60%)</div>
+                        <div class="text-2xl font-bold text-purple-600">R$ <span id="faixa-premium">89,01</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Buttons -->
+        <div class="text-center mb-6 space-y-4">
+            <div class="flex justify-center">
+                <button onclick="exportToPDF()" class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-lg font-semibold text-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-200 shadow-lg">
+                    📄 Exportar para PDF
+                </button>
+            </div>
+            <p class="text-sm text-gray-600">
+                Gere um relatório completo em PDF com todos os cálculos
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-white rounded-2xl p-6 shadow-lg">
+            <!-- Observações -->
+            <div class="text-center text-gray-600 mb-6">
+                <p class="text-sm">
+                    <strong>📋 Observações:</strong> 
+                    Cálculo considera 4,33 semanas por mês. Depreciação calculada pelo método linear.
+                    Meio período e diárias incluem descontos configuráveis para incentivar contratações maiores.
+                </p>
+            </div>
+            
+            <!-- Separador -->
+            <div class="border-t border-gray-200 pt-6">
+                <!-- Informações da Akssa Consultoria -->
+                <div class="text-center">
+                    <h3 class="text-xl font-bold text-purple-700 mb-4">AKSSA CONSULTORIA</h3>
+                    <div class="flex flex-col md:flex-row justify-center items-center gap-4 text-gray-700">
+                        <div class="flex items-center gap-2">
+                            <span class="text-green-600 text-lg">📱</span>
+                            <span class="font-semibold">Telefone:</span>
+                            <a href="tel:+556298209-6397" class="text-purple-600 hover:text-purple-800 font-medium">
+                                +55 (62) 98209-6397
+                            </a>
+                        </div>
+                        <div class="hidden md:block text-gray-400">|</div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-pink-600 text-lg">📷</span>
+                            <span class="font-semibold">Instagram:</span>
+                            <a href="https://instagram.com/akssaconsultoria" target="_blank" class="text-purple-600 hover:text-purple-800 font-medium">
+                                @akssaconsultoria
+                            </a>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-4">
+                        Especialistas em consultoria empresarial e precificação estratégica
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatCurrency(value) {
+            return value.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        }
+
+        function calculateAll() {
+            calculateCustos();
+            calculateEquipamentos();
+            calculatePrecos();
+        }
+
+        function calculateCustos() {
+            // Custos Fixos
+            const aluguel = parseFloat(document.getElementById('aluguel').value) || 0;
+            const internet = parseFloat(document.getElementById('internet').value) || 0;
+            const software = parseFloat(document.getElementById('software').value) || 0;
+            const energia = parseFloat(document.getElementById('energia').value) || 0;
+            const contador = parseFloat(document.getElementById('contador').value) || 0;
+            const marketing = parseFloat(document.getElementById('marketing').value) || 0;
+            const outrosFixos = parseFloat(document.getElementById('outros-fixos').value) || 0;
+
+            // Custos Fixos Extras
+            let custosFixosExtras = 0;
+            const fixosExtrasRows = document.querySelectorAll('#custos-fixos-extras tr');
+            fixosExtrasRows.forEach(row => {
+                const input = row.querySelector('input[type="number"]');
+                if (input) {
+                    custosFixosExtras += parseFloat(input.value) || 0;
+                }
+            });
+
+            const totalFixos = aluguel + internet + software + energia + contador + marketing + outrosFixos + custosFixosExtras;
+            document.getElementById('total-fixos').textContent = formatCurrency(totalFixos);
+
+            // Custos Variáveis
+            const transporte = parseFloat(document.getElementById('transporte').value) || 0;
+            const material = parseFloat(document.getElementById('material').value) || 0;
+            const cursos = parseFloat(document.getElementById('cursos').value) || 0;
+            const outrosVariaveis = parseFloat(document.getElementById('outros-variaveis').value) || 0;
+
+            // Custos Variáveis Extras
+            let custosVariaveisExtras = 0;
+            const variaveisExtrasRows = document.querySelectorAll('#custos-variaveis-extras tr');
+            variaveisExtrasRows.forEach(row => {
+                const input = row.querySelector('input[type="number"]');
+                if (input) {
+                    custosVariaveisExtras += parseFloat(input.value) || 0;
+                }
+            });
+
+            const totalVariaveis = transporte + material + cursos + outrosVariaveis + custosVariaveisExtras;
+            document.getElementById('total-variaveis').textContent = formatCurrency(totalVariaveis);
+
+            return { totalFixos, totalVariaveis };
+        }
+
+        function addCustoFixo() {
+            const tbody = document.getElementById('custos-fixos-extras');
+            const rowCount = tbody.children.length;
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>
+                    <input type="text" class="input-cell w-full p-2" placeholder="Nome do custo" oninput="calculateAll()">
+                </td>
+                <td class="text-center">
+                    <div class="flex items-center justify-center gap-2">
+                        <input type="number" class="input-cell w-20 p-2 text-center" value="0" oninput="calculateAll()">
+                        <button onclick="removeCusto(this)" class="text-red-500 hover:text-red-700 text-sm">
+                            ✕
+                        </button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(newRow);
+            calculateAll();
+        }
+
+        function addCustoVariavel() {
+            const tbody = document.getElementById('custos-variaveis-extras');
+            const rowCount = tbody.children.length;
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>
+                    <input type="text" class="input-cell w-full p-2" placeholder="Nome do custo" oninput="calculateAll()">
+                </td>
+                <td class="text-center">
+                    <div class="flex items-center justify-center gap-2">
+                        <input type="number" class="input-cell w-20 p-2 text-center" value="0" oninput="calculateAll()">
+                        <button onclick="removeCusto(this)" class="text-red-500 hover:text-red-700 text-sm">
+                            ✕
+                        </button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(newRow);
+            calculateAll();
+        }
+
+        function removeCusto(button) {
+            const row = button.closest('tr');
+            row.remove();
+            calculateAll();
+        }
+
+        function calculateEquipamentos() {
+            // Equipamentos Quitados - Depreciação
+            const quitadosRows = document.querySelectorAll('#equipamentos-quitados tr');
+            let totalDepreciacao = 0;
+
+            quitadosRows.forEach((row, index) => {
+                const inputs = row.querySelectorAll('input');
+                if (inputs.length >= 3) {
+                    const valor = parseFloat(inputs[1].value) || 0;
+                    const vidaUtil = parseFloat(inputs[2].value) || 1;
+                    const depreciacao = valor / (vidaUtil * 12);
+                    totalDepreciacao += depreciacao;
+
+                    const depCell = document.getElementById(`dep-quitado-${index}`);
+                    if (depCell) depCell.textContent = `R$ ${depreciacao.toFixed(2)}`;
+                }
+            });
+
+            // Equipamentos Financiados
+            const financiadosRows = document.querySelectorAll('#equipamentos-financiados tr');
+            let totalFinanciamentos = 0;
+
+            financiadosRows.forEach((row, index) => {
+                const inputs = row.querySelectorAll('input');
+                if (inputs.length >= 3) {
+                    const parcela = parseFloat(inputs[1].value) || 0;
+                    const parcelasRestantes = parseFloat(inputs[2].value) || 0;
+                    const custoMensal = parcelasRestantes > 0 ? parcela : 0;
+                    totalFinanciamentos += custoMensal;
+
+                    const custoCell = document.getElementById(`custo-financiado-${index}`);
+                    if (custoCell) custoCell.textContent = `R$ ${custoMensal.toFixed(2)}`;
+                }
+            });
+
+            document.getElementById('total-depreciacao').textContent = formatCurrency(totalDepreciacao);
+            document.getElementById('total-financiamentos').textContent = formatCurrency(totalFinanciamentos);
+
+            return { totalDepreciacao, totalFinanciamentos };
+        }
+
+        function calculatePrecos() {
+            const custos = calculateCustos();
+            const equipamentos = calculateEquipamentos();
+
+            // Outros valores
+            const proLabore = parseFloat(document.getElementById('pro-labore').value) || 0;
+            const impostos = parseFloat(document.getElementById('impostos').value) || 0;
+            const margem = parseFloat(document.getElementById('margem').value) || 0;
+            const horasSemanais = parseFloat(document.getElementById('horas-semanais').value) || 40;
+            const horasNaoProdutivas = parseFloat(document.getElementById('horas-nao-produtivas').value) || 8;
+
+            // Cálculos
+            const custoTotalMensal = custos.totalFixos + custos.totalVariaveis + proLabore + impostos + 
+                                   equipamentos.totalDepreciacao + equipamentos.totalFinanciamentos;
+            
+            const horasProdutivas = (horasSemanais - horasNaoProdutivas) * 4.33;
+            const custoHoraBase = custoTotalMensal / horasProdutivas;
+            const valorHoraFinal = custoHoraBase * (1 + margem / 100);
+
+            // Descontos para meio período e diária
+            const descontoMeio = parseFloat(document.getElementById('desconto-meio').value) || 10;
+            const descontoDiaria = parseFloat(document.getElementById('desconto-diaria').value) || 10;
+
+            const precoMeioPeriodo = (valorHoraFinal * 4) * (1 - descontoMeio / 100);
+            const precoDiaria = (valorHoraFinal * 8) * (1 - descontoDiaria / 100);
+
+            // Atualizar displays
+            document.getElementById('custo-total-mensal').textContent = formatCurrency(custoTotalMensal);
+            document.getElementById('horas-produtivas').textContent = horasProdutivas.toFixed(1);
+            document.getElementById('custo-hora-base').textContent = custoHoraBase.toFixed(2);
+            document.getElementById('valor-hora-final').textContent = valorHoraFinal.toFixed(2);
+
+            document.getElementById('preco-hora').textContent = valorHoraFinal.toFixed(2);
+            document.getElementById('preco-meio-periodo').textContent = precoMeioPeriodo.toFixed(2);
+            document.getElementById('preco-diaria').textContent = precoDiaria.toFixed(2);
+
+            // Faixas de preço
+            document.getElementById('faixa-minimo').textContent = valorHoraFinal.toFixed(2);
+            document.getElementById('faixa-padrao').textContent = (valorHoraFinal * 1.3).toFixed(2);
+            document.getElementById('faixa-premium').textContent = (valorHoraFinal * 1.6).toFixed(2);
+        }
+
+        function addEquipamento(tipo) {
+            const tbody = document.getElementById(`equipamentos-${tipo === 'quitado' ? 'quitados' : 'financiados'}`);
+            const rowCount = tbody.children.length;
+            const newRow = document.createElement('tr');
+
+            if (tipo === 'quitado') {
+                newRow.innerHTML = `
+                    <td><input type="text" class="input-cell w-full p-2" value="Novo Equipamento" oninput="calculateAll()"></td>
+                    <td class="text-center"><input type="number" class="input-cell w-20 p-2 text-center" value="1000" oninput="calculateAll()"></td>
+                    <td class="text-center"><input type="number" class="input-cell w-16 p-2 text-center" value="3" oninput="calculateAll()"></td>
+                    <td class="text-center font-mono text-sm" id="dep-quitado-${rowCount}">R$ 27,78</td>
+                `;
+            } else {
+                newRow.innerHTML = `
+                    <td><input type="text" class="input-cell w-full p-2" value="Novo Equipamento" oninput="calculateAll()"></td>
+                    <td class="text-center"><input type="number" class="input-cell w-20 p-2 text-center" value="100" oninput="calculateAll()"></td>
+                    <td class="text-center"><input type="number" class="input-cell w-16 p-2 text-center" value="12" oninput="calculateAll()"></td>
+                    <td class="text-center font-mono text-sm" id="custo-financiado-${rowCount}">R$ 100,00</td>
+                `;
+            }
+
+            tbody.appendChild(newRow);
+            calculateAll();
+        }
+
+
+
+        function exportToPDF() {
+            // Create a new window for PDF generation
+            const printWindow = window.open('', '_blank');
+            
+            // Get current date for the report
+            const currentDate = new Date().toLocaleDateString('pt-BR');
+            
+            // Collect all the calculated values
+            const custoTotalMensal = document.getElementById('custo-total-mensal').textContent;
+            const horasProdutivas = document.getElementById('horas-produtivas').textContent;
+            const valorHoraFinal = document.getElementById('valor-hora-final').textContent;
+            const precoHora = document.getElementById('preco-hora').textContent;
+            const precoMeioPeriodo = document.getElementById('preco-meio-periodo').textContent;
+            const precoDiaria = document.getElementById('preco-diaria').textContent;
+            const totalFixos = document.getElementById('total-fixos').textContent;
+            const totalVariaveis = document.getElementById('total-variaveis').textContent;
+            const totalDepreciacao = document.getElementById('total-depreciacao').textContent;
+            const totalFinanciamentos = document.getElementById('total-financiamentos').textContent;
+            const faixaMinimo = document.getElementById('faixa-minimo').textContent;
+            const faixaPadrao = document.getElementById('faixa-padrao').textContent;
+            const faixaPremium = document.getElementById('faixa-premium').textContent;
+            
+            // Get configuration values
+            const proLabore = document.getElementById('pro-labore').value;
+            const margem = document.getElementById('margem').value;
+            const horasSemanais = document.getElementById('horas-semanais').value;
+            const horasNaoProdutivas = document.getElementById('horas-nao-produtivas').value;
+            
+            // Create PDF content
+            const pdfContent = `
+            <!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+                <meta charset="UTF-8">
+                <title>Relatório de Precificação - Akssa Consultoria</title>
+                <style>
+                    body { 
+                        font-family: Arial, sans-serif; 
+                        margin: 20px; 
+                        color: #333;
+                        line-height: 1.4;
+                    }
+                    .header { 
+                        text-align: center; 
+                        margin-bottom: 30px; 
+                        border-bottom: 2px solid #7c3aed;
+                        padding-bottom: 20px;
+                    }
+                    .company-name { 
+                        color: #7c3aed; 
+                        font-size: 24px; 
+                        font-weight: bold; 
+                        margin-bottom: 10px;
+                    }
+                    .report-title { 
+                        font-size: 20px; 
+                        margin-bottom: 5px;
+                    }
+                    .date { 
+                        color: #666; 
+                        font-size: 14px;
+                    }
+                    .section { 
+                        margin-bottom: 25px; 
+                        page-break-inside: avoid;
+                    }
+                    .section-title { 
+                        background: #7c3aed; 
+                        color: white; 
+                        padding: 8px 15px; 
+                        font-weight: bold; 
+                        margin-bottom: 15px;
+                        border-radius: 5px;
+                    }
+                    .summary-grid { 
+                        display: grid; 
+                        grid-template-columns: 1fr 1fr; 
+                        gap: 20px; 
+                        margin-bottom: 20px;
+                    }
+                    .summary-item { 
+                        background: #f8f9fa; 
+                        padding: 15px; 
+                        border-radius: 8px; 
+                        border-left: 4px solid #7c3aed;
+                    }
+                    .summary-label { 
+                        font-weight: bold; 
+                        color: #7c3aed; 
+                        margin-bottom: 5px;
+                    }
+                    .summary-value { 
+                        font-size: 18px; 
+                        font-weight: bold;
+                    }
+                    .pricing-table { 
+                        width: 100%; 
+                        border-collapse: collapse; 
+                        margin-top: 15px;
+                    }
+                    .pricing-table th, .pricing-table td { 
+                        border: 1px solid #ddd; 
+                        padding: 10px; 
+                        text-align: left;
+                    }
+                    .pricing-table th { 
+                        background: #7c3aed; 
+                        color: white; 
+                        font-weight: bold;
+                    }
+                    .pricing-table tr:nth-child(even) { 
+                        background: #f8f9fa;
+                    }
+                    .highlight { 
+                        background: #e0e7ff !important; 
+                        font-weight: bold;
+                    }
+                    .footer { 
+                        margin-top: 30px; 
+                        padding-top: 20px; 
+                        border-top: 1px solid #ddd; 
+                        font-size: 12px; 
+                        color: #666; 
+                        text-align: center;
+                    }
+                    @media print {
+                        body { margin: 0; }
+                        .section { page-break-inside: avoid; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+
+                    <div class="company-name">AKSSA CONSULTORIA</div>
+                    <div class="report-title">Relatório de Precificação de Serviços</div>
+                    <div class="date">Gerado em: ${currentDate}</div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">📊 Resumo Executivo</div>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="summary-label">Custo Total Mensal</div>
+                            <div class="summary-value">R$ ${custoTotalMensal}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Horas Produtivas/Mês</div>
+                            <div class="summary-value">${horasProdutivas}h</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Valor Hora Recomendado</div>
+                            <div class="summary-value">R$ ${valorHoraFinal}</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Margem de Segurança</div>
+                            <div class="summary-value">${margem}%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">💰 Estrutura de Custos</div>
+                    <table class="pricing-table">
+                        <tr>
+                            <th>Categoria</th>
+                            <th>Valor Mensal</th>
+                        </tr>
+                        <tr>
+                            <td>Custos Fixos</td>
+                            <td>R$ ${totalFixos}</td>
+                        </tr>
+                        <tr>
+                            <td>Custos Variáveis</td>
+                            <td>R$ ${totalVariaveis}</td>
+                        </tr>
+                        <tr>
+                            <td>Pró-labore Desejado</td>
+                            <td>R$ ${parseFloat(proLabore).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                        </tr>
+                        <tr>
+                            <td>Depreciação de Equipamentos</td>
+                            <td>R$ ${totalDepreciacao}</td>
+                        </tr>
+                        <tr>
+                            <td>Financiamentos</td>
+                            <td>R$ ${totalFinanciamentos}</td>
+                        </tr>
+                        <tr class="highlight">
+                            <td><strong>Total Geral</strong></td>
+                            <td><strong>R$ ${custoTotalMensal}</strong></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">🎯 Preços Recomendados</div>
+                    <table class="pricing-table">
+                        <tr>
+                            <th>Tipo de Serviço</th>
+                            <th>Valor</th>
+                            <th>Observações</th>
+                        </tr>
+                        <tr>
+                            <td>Valor por Hora</td>
+                            <td>R$ ${precoHora}</td>
+                            <td>Preço base com margem de segurança</td>
+                        </tr>
+                        <tr>
+                            <td>Meio Período (4h)</td>
+                            <td>R$ ${precoMeioPeriodo}</td>
+                            <td>Com desconto promocional</td>
+                        </tr>
+                        <tr>
+                            <td>Diária (8h)</td>
+                            <td>R$ ${precoDiaria}</td>
+                            <td>Com desconto promocional</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">📈 Faixas de Preço por Hora</div>
+                    <table class="pricing-table">
+                        <tr>
+                            <th>Categoria</th>
+                            <th>Valor por Hora</th>
+                            <th>Aplicação</th>
+                        </tr>
+                        <tr>
+                            <td>Mínimo (Custo)</td>
+                            <td>R$ ${faixaMinimo}</td>
+                            <td>Preço de custo - não recomendado</td>
+                        </tr>
+                        <tr>
+                            <td>Padrão (+30%)</td>
+                            <td>R$ ${faixaPadrao}</td>
+                            <td>Clientes regulares</td>
+                        </tr>
+                        <tr class="highlight">
+                            <td>Premium (+60%)</td>
+                            <td>R$ ${faixaPremium}</td>
+                            <td>Projetos especiais/urgentes</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">⚙️ Configurações Utilizadas</div>
+                    <table class="pricing-table">
+                        <tr>
+                            <th>Parâmetro</th>
+                            <th>Valor</th>
+                        </tr>
+                        <tr>
+                            <td>Horas Semanais</td>
+                            <td>${horasSemanais}h</td>
+                        </tr>
+                        <tr>
+                            <td>Horas Não Produtivas</td>
+                            <td>${horasNaoProdutivas}h</td>
+                        </tr>
+                        <tr>
+                            <td>Margem de Segurança</td>
+                            <td>${margem}%</td>
+                        </tr>
+                        <tr>
+                            <td>Semanas por Mês</td>
+                            <td>4,33</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="footer">
+                    <p><strong>Akssa Consultoria</strong> - Tel: +55 (62) 98209-6397 | Instagram: @akssaconsultoria</p>
+                    <p>Relatório gerado automaticamente pela Calculadora de Precificação</p>
+                    <p>Este relatório considera todos os custos informados e aplica metodologia de precificação profissional.</p>
+                </div>
+            </body>
+            </html>
+            `;
+            
+            // Write content to new window and trigger print
+            printWindow.document.write(pdfContent);
+            printWindow.document.close();
+            
+            // Wait for content to load then print
+            printWindow.onload = function() {
+                setTimeout(function() {
+                    printWindow.print();
+                }, 500);
+            };
+        }
+
+        // Initialize calculations on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            calculateAll();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'976cecd85735f233',t:'MTc1NjQ3OTcwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
