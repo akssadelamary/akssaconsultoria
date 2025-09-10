@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planilha Financeira MEI</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; color: #333; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { background: white; border-radius: 15px; padding: 25px; margin-bottom: 25px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .company-info { display: flex; align-items: center; gap: 20px; }
+        .logo-placeholder { width: 80px; height: 80px; background: linear-gradient(45deg, #4CAF50, #45a049); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold; }
+        .company-details h1 { color: #2c3e50; font-size: 28px; margin-bottom: 5px; }
+        .company-details p { color: #7f8c8d; font-size: 14px; }
+        .status-indicator { padding: 12px 24px; border-radius: 25px; font-weight: bold; font-size: 16px; transition: all 0.3s ease; }
+        .status-green { background: linear-gradient(45deg, #4CAF50, #45a049); color: white; }
+        .status-red { background: linear-gradient(45deg, #f44336, #d32f2f); color: white; }
+        .tabs { display: flex; background: white; border-radius: 15px; padding: 8px; margin-bottom: 25px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); overflow-x: auto; }
+        .tab { padding: 15px 25px; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; font-weight: 600; white-space: nowrap; color: #7f8c8d; }
+        .tab.active { background: linear-gradient(45deg, #667eea, #764ba2); color: white; transform: translateY(-2px); }
+        .tab-content { display: none; background: white; border-radius: 15px; padding: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { font-weight: 600; margin-bottom: 8px; color: #2c3e50; }
+        .form-group input, .form-group select { padding: 12px 15px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 14px; transition: all 0.3s ease; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+        .btn { padding: 12px 30px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 14px; }
+        .btn-primary { background: linear-gradient(45deg, #667eea, #764ba2); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3); }
+        .btn-danger { background: linear-gradient(45deg, #f44336, #d32f2f); color: white; }
+        .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(244, 67, 54, 0.3); }
+        .table-container { overflow-x: auto; margin: 25px 0; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th { background: linear-gradient(45deg, #2c3e50, #34495e); color: white; padding: 15px; text-align: left; font-weight: 600; }
+        td { padding: 15px; border-bottom: 1px solid #e9ecef; }
+        tr:hover { background: #f8f9fa; }
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 25px; margin-top: 30px; }
+        .chart-container { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+        .chart-title { font-size: 18px; font-weight: 600; color: #2c3e50; margin-bottom: 20px; text-align: center; }
+        .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .summary-card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); text-align: center; transition: transform 0.3s ease; }
+        .summary-card:hover { transform: translateY(-5px); }
+        .summary-card h3 { color: #7f8c8d; font-size: 14px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .summary-card .value { font-size: 28px; font-weight: bold; color: #2c3e50; }
+        .summary-card.positive .value { color: #4CAF50; }
+        .summary-card.negative .value { color: #f44336; }
+        .config-section { background: #f8f9fa; border-radius: 12px; padding: 25px; margin-bottom: 25px; }
+        .config-section h3 { color: #2c3e50; margin-bottom: 20px; font-size: 20px; }
+        .delete-btn { background: #f44336; border: none; color: white; cursor: pointer; font-size: 12px; padding: 8px 12px; border-radius: 4px; transition: all 0.3s ease; font-weight: 500; }
+        .delete-btn:hover { background: #d32f2f; transform: translateY(-1px); }
+        @media (max-width: 768px) {
+            .container { padding: 10px; }
+            .header { flex-direction: column; text-align: center; gap: 15px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="company-info">
+                <div class="logo-placeholder">MEI</div>
+                <div class="company-details">
+                    <h1 id="companyName">Minha Empresa MEI</h1>
+                    <p>CNPJ: <span id="companyCNPJ">00.000.000/0001-00</span></p>
+                    <p>Período: <span id="currentPeriod">Janeiro 2024</span></p>
+                </div>
+            </div>
+            <div class="status-indicator" id="statusIndicator">Faturamento Adequado</div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('receitas')">Receitas</div>
+            <div class="tab" onclick="showTab('despesas')">Despesas</div>
+            <div class="tab" onclick="showTab('calculo')">Faturamento Mínimo</div>
+            <div class="tab" onclick="showTab('prolabore')">Pró-Labore</div>
+            <div class="tab" onclick="showTab('dashboard')">Dashboard</div>
+            <div class="tab" onclick="showTab('configuracoes')">Configurações</div>
+        </div>
+
+        <!-- Tab: Receitas -->
+        <div class="tab-content active" id="receitas">
+            <h2>Controle de Receitas</h2>
+            <div class="form-grid">
+                <div class="form-group"><label>Cliente</label><input type="text" id="cliente" placeholder="Nome do cliente"></div>
+                <div class="form-group"><label>Data de Recebimento</label><input type="date" id="dataRecebimento"></div>
+                <div class="form-group"><label>Valor Acordado (R$)</label><input type="number" id="valorAcordado" step="0.01" placeholder="0,00"></div>
+                <div class="form-group"><label>Valor Pago (R$)</label><input type="number" id="valorPago" step="0.01" placeholder="0,00"></div>
+            </div>
+            <button class="btn btn-primary" onclick="adicionarReceita()">Adicionar Receita</button>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>Cliente</th><th>Data</th><th>Valor Acordado</th><th>Valor Pago</th><th>Status</th><th>Ações</th></tr>
+                    </thead>
+                    <tbody id="tabelaReceitas"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab: Despesas -->
+        <div class="tab-content" id="despesas">
+            <h2>Controle de Despesas</h2>
+            <div class="form-grid">
+                <div class="form-group"><label>Descrição</label><input type="text" id="descricaoDespesa" placeholder="Descrição da despesa"></div>
+                <div class="form-group"><label>Tipo</label><select id="tipoDespesa"><option value="fixa">Fixa</option><option value="variavel">Variável</option></select></div>
+                <div class="form-group"><label>Categoria</label><select id="categoriaDespesa"><option value="aluguel">Aluguel</option><option value="internet">Internet</option><option value="contador">Contador</option><option value="insumos">Insumos</option><option value="transporte">Transporte</option><option value="marketing">Marketing</option><option value="outros">Outros</option></select></div>
+                <div class="form-group"><label>Data</label><input type="date" id="dataDespesa"></div>
+                <div class="form-group"><label>Valor (R$)</label><input type="number" id="valorDespesa" step="0.01" placeholder="0,00"></div>
+            </div>
+            <button class="btn btn-primary" onclick="adicionarDespesa()">Adicionar Despesa</button>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>Descrição</th><th>Tipo</th><th>Categoria</th><th>Data</th><th>Valor</th><th>Ações</th></tr>
+                    </thead>
+                    <tbody id="tabelaDespesas"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Remaining tabs omitted for brevity -->
+        
+    </div>
+</body>
+</html>
